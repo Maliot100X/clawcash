@@ -1,0 +1,239 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", system-ui, sans-serif;
+  --font-display: "Instrument Serif", Georgia, serif;
+
+  --color-ink: #09090b;
+  --color-card: #121214;
+  --color-panel: #1a1917;
+  --color-line: #2e2c28;
+  --color-bone: #f4ede4;
+  --color-soft: #d4ccc0;
+  --color-mute: #a39b90;
+  --color-ember: #ff4b1f;
+  --color-ember-hi: #ff6a42;
+  --color-gold: #e8b15a;
+  --color-gain: #3ddc97;
+  --color-danger: #ff6b7a;
+
+  --radius-app: 2.25rem;
+  --shadow-ember: 0 14px 34px -16px rgb(255 75 31 / 0.7);
+  --shadow-dock: 0 18px 50px -24px rgb(0 0 0 / 0.85);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility shadow-ember {
+  box-shadow: var(--shadow-ember);
+}
+
+@utility shadow-dock {
+  box-shadow: var(--shadow-dock);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background: var(--color-ink);
+    color: var(--color-bone);
+  }
+
+  body {
+    min-height: 100dvh;
+    overflow-x: hidden;
+    background:
+      radial-gradient(900px 420px at 90% -10%, rgb(255 75 31 / 0.14), transparent 60%),
+      radial-gradient(700px 380px at -10% 20%, rgb(232 177 90 / 0.08), transparent 55%),
+      var(--color-ink);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ember);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-ember);
+    color: var(--color-ink);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(12px, -28px, 0);
+  }
+}
+
+@keyframes reel {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.rise {
+  animation: rise 520ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+.rise-late {
+  animation-delay: 90ms;
+}
+
+.press {
+  transition: scale 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out;
+}
+
+.press:active:not(:disabled) {
+  scale: 0.96;
+}
+
+.orbit-mark {
+  position: relative;
+  display: inline-grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+}
+
+.orbit-mark span {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-ember) 45%, transparent);
+  animation: spin-slow 9s linear infinite;
+}
+
+.orbit-mark span::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  margin-left: -2px;
+  border-radius: 999px;
+  background: var(--color-ember);
+  box-shadow: 0 0 8px var(--color-ember);
+}
+
+.orbit-mark span:nth-child(1) {
+  inset: 0;
+}
+
+.orbit-mark span:nth-child(2) {
+  inset: 5px;
+  animation-duration: 6s;
+  animation-direction: reverse;
+  border-color: color-mix(in srgb, var(--color-gold) 55%, transparent);
+}
+
+.orbit-mark span:nth-child(2)::after {
+  background: var(--color-gold);
+  box-shadow: 0 0 8px var(--color-gold);
+}
+
+.orbit-mark span:nth-child(3) {
+  inset: 10px;
+  animation-duration: 4s;
+  border-color: color-mix(in srgb, var(--color-bone) 35%, transparent);
+}
+
+.orbit-mark span:nth-child(3)::after {
+  background: var(--color-bone);
+  box-shadow: none;
+}
+
+.mote {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-ember);
+  box-shadow: 0 0 12px var(--color-ember);
+  animation: drift 7s ease-in-out infinite;
+}
+
+.card-spot {
+  background-image: radial-gradient(
+    320px circle at var(--spot-x, 72%) var(--spot-y, 18%),
+    rgb(255 75 31 / 0.2),
+    transparent 58%
+  );
+}
+
+.vignette {
+  background: radial-gradient(circle at 50% 42%, transparent 42%, rgb(9 9 11 / 0.78) 100%);
+}
+
+.reel-track {
+  animation: reel 36s linear infinite;
+}
+
+.reel-track:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .orbit-mark span,
+  .mote,
+  .reel-track {
+    animation: none !important;
+  }
+}

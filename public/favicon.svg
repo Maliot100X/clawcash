@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="ClawCash">
+  <rect width="32" height="32" rx="7" fill="#09090B"/>
+  <path fill="#FF4B1F" d="M6.4 25.2c1.15-7.4 3.15-13.6 5.7-18.2.85 5.6-.15 11.6-1.95 18.2H6.4z"/>
+  <path fill="#F4EDE4" d="M13.1 26.1c1.35-8.5 3.7-15.5 6.55-20.4.9 6.4-.05 13.2-2.25 20.4h-4.3z"/>
+  <path fill="#E8B15A" d="M20.6 24.6c1.05-6.5 2.95-11.8 5.15-15.6.7 4.7.05 9.8-1.55 15.6h-3.6z"/>
+</svg>
