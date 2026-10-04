@@ -5,6 +5,7 @@ export declare function escapeHtml(value: unknown): string;
 export declare function appNameFromHost(hostHeader: string | null | undefined): string;
 export declare function publicAppHost(hostHeader: string | null | undefined): string;
 export declare function resolvePublicHost(hostHeader: string | null | undefined): string;
+export declare function referralFromRequest(pagePath?: string, pageSearch?: string): string;
 export declare function isInstallQuery(url: string | null | undefined): boolean;
 export declare function isDocumentPath(pathname: string | null | undefined): boolean;
 export declare function acceptsHtml(accept: string | null | undefined): boolean;
@@ -41,6 +42,8 @@ export type GrokHeadContext = {
   host?: string | null;
   cwd?: string;
   site?: OgSite;
+  pagePath?: string;
+  pageSearch?: string;
 };
 
 export declare function readOgSite(cwd?: string): OgSite;
@@ -63,6 +66,8 @@ export declare function grokOgHeadTags(ctx?: {
   site?: OgSite;
   documentTitle?: string;
   cwd?: string;
+  pagePath?: string;
+  pageSearch?: string;
 }): string[];
 export declare function stripShareMetaTags(html: string): string;
 export declare function normalizeHeadContext(ctx?: GrokHeadContext): {
@@ -73,6 +78,8 @@ export declare function normalizeHeadContext(ctx?: GrokHeadContext): {
   host: string;
   cwd: string;
   site: OgSite;
+  pagePath: string;
+  pageSearch: string;
 };
 export declare function injectGrokPwaHead(html: string, ctx?: GrokHeadContext): string;
 export declare function createHeadInjector(ctx?: GrokHeadContext): {

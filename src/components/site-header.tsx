@@ -2,9 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { brand, roundList, type RoundId } from "@/lib/campaigns";
 import { ClawMark, XMark } from "@/components/claw-mark";
 
-export type NavId = RoundId | "arena" | "collection" | "token" | "launch" | "world" | "setup";
+export type NavId = RoundId | "arena" | "collection" | "token" | "launch" | "world" | "setup" | "board";
 
 const extras = [
+  { id: "board" as const, path: "/leaderboard" as const, label: "Board", hint: "Live" },
   { id: "world" as const, path: "/world" as const, label: "World", hint: "Live" },
   { id: "setup" as const, path: "/setup" as const, label: "Setup", hint: "Embed" },
   { id: "token" as const, path: "/token" as const, label: "Token", hint: "$CLAWRENA" },

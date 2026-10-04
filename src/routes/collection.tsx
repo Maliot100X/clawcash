@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowUpRight, X } from "lucide-react";
+import { ArrowUpRight, Check, Copy, X } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { collection } from "@/lib/agents";
+import { filmPost } from "@/lib/board";
+import { filmVideo, shareOrigin } from "@/lib/campaigns";
 
 export const Route = createFileRoute("/collection")({
   component: CollectionPage,
@@ -18,7 +20,9 @@ type Piece = (typeof collection)[number];
 
 function CollectionPage() {
   const [open, setOpen] = useState<Piece | null>(null);
+  const [copied, setCopied] = useState<"" | "ok" | "fail">("");
   const strip = [...collection, ...collection];
+  const post = filmPost();
 
   useEffect(() => {
     if (!open) return;
@@ -67,6 +71,56 @@ function CollectionPage() {
             </Link>
           </figcaption>
         </figure>
+
+        <section className="mt-4 rounded-3xl border border-line bg-panel p-5">
+          <p className="font-semibold">Share the full film</p>
+          <p className="mt-1 text-sm text-mute">
+            The post ends on the video file, so X attaches the whole orbit. Site, collection, and card stay in the text.
+          </p>
+          <p className="mt-3 truncate text-sm text-soft" title={filmVideo}>
+            {filmVideo}
+          </p>
+          <textarea
+            readOnly
+            value={post}
+            rows={12}
+            aria-label="Collection post for X"
+            className="mt-3 w-full resize-none rounded-2xl border border-line bg-ink px-3 py-3 text-sm leading-relaxed text-soft"
+          />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                void navigator.clipboard.writeText(post).then(
+                  () => {
+                    setCopied("ok");
+                    window.setTimeout(() => setCopied(""), 2000);
+                  },
+                  () => setCopied("fail"),
+                );
+              }}
+              className="press inline-flex items-center gap-1.5 rounded-xl border border-line px-4 py-2.5 text-sm font-semibold"
+            >
+              {copied === "ok" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copied === "ok" ? "Post copied" : "Copy post"}
+            </button>
+            <a
+              href={`https://x.com/intent/tweet?text=${encodeURIComponent(post)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="press inline-flex items-center rounded-xl bg-bone px-4 py-2.5 text-sm font-semibold text-ink"
+            >
+              Post on X
+            </a>
+            <a
+              href={shareOrigin}
+              className="inline-flex items-center rounded-xl px-4 py-2.5 text-sm font-semibold text-ember"
+            >
+              {shareOrigin.replace("https://", "")}
+            </a>
+          </div>
+          {copied === "fail" ? <p className="mt-2 text-xs text-danger">Select the text and copy it.</p> : null}
+        </section>
 
         <div className="mt-8 overflow-hidden rounded-3xl border border-line bg-ink">
           <div className="reel-track flex w-max gap-3 py-3">

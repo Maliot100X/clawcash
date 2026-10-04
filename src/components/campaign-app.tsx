@@ -3,7 +3,6 @@ import {
   ArrowUpRight,
   Bell,
   Check,
-  Copy,
   ExternalLink,
   Heart,
   Home,
@@ -20,6 +19,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Atmosphere } from "@/components/atmosphere";
 import { ClawMark, XMark } from "@/components/claw-mark";
 import { SiteHeader } from "@/components/site-header";
+import { ShareKit } from "@/components/share-kit";
 import {
   brand,
   coming,
@@ -78,8 +78,8 @@ async function copyText(value: string) {
   }
 }
 
-export function CampaignApp({ round }: { round: Round }) {
-  const { state, ready, setHandle, markOpened, markDone, doneCount, complete } = useCampaign(round);
+export function CampaignApp({ round, refHandle }: { round: Round; refHandle?: string }) {
+  const { state, ready, setHandle, markOpened, markDone, doneCount, complete } = useCampaign(round, refHandle);
   const [tab, setTab] = useState<TabId>("campaign");
   const [section, setSection] = useState<SectionId>("home");
   const [copied, setCopied] = useState(false);
@@ -96,6 +96,25 @@ export function CampaignApp({ round }: { round: Round }) {
     }
     wasComplete.current = complete;
   }, [complete, ready]);
+
+  useEffect(() => {
+    if (!ready || !state.handle) return;
+    const done = tasks.filter((task) => state.done[task.id]).map((task) => task.id);
+    if (done.length === 0) return;
+    const timer = window.setTimeout(() => {
+      void fetch("/api/leaderboard", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          handle: state.handle,
+          referrer: state.referrer,
+          round: round.id,
+          tasks: done,
+        }),
+      });
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [ready, round.id, state.done, state.handle, state.referrer]);
 
   function scrollToCard() {
     cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -685,6 +704,14 @@ function TaskPanel({
           ? ` This round reserves $${round.rewardUsd} and ${round.rewardTokens.toLocaleString("en-US")} $${round.tokenSymbol}.`
           : ` This round reserves $${round.rewardUsd}.`}
       </p>
+      {handle ? (
+        <ShareKit
+          handle={handle}
+          doneCount={doneCount}
+          complete={doneCount === tasks.length}
+          pendingUsd={round.rewardUsd}
+        />
+      ) : null}
     </div>
   );
 }
@@ -704,17 +731,9 @@ function RewardPanel({
   amount: number;
   onTasks: () => void;
 }) {
-  const [copyState, setCopyState] = useState<"" | "ok" | "fail">("");
-  const link = inviteLink(handle, round.path);
   const steps = tasks.length + 1;
   const filled = (handle ? 1 : 0) + doneCount;
   const parts = moneyParts(complete ? amount : round.rewardUsd);
-
-  async function onCopy() {
-    const ok = await copyText(link);
-    setCopyState(ok ? "ok" : "fail");
-    window.setTimeout(() => setCopyState(""), 2200);
-  }
 
   if (!complete) {
     return (
@@ -751,6 +770,7 @@ function RewardPanel({
         >
           {handle ? "Finish the tasks" : "Start the campaign"}
         </button>
+        {handle ? <ShareKit handle={handle} doneCount={doneCount} complete={false} pendingUsd={round.rewardUsd} /> : null}
       </div>
     );
   }
@@ -775,35 +795,7 @@ function RewardPanel({
         </p>
       ) : null}
       <div className="mt-5 border-t border-dashed border-line pt-4">
-        <p className="font-semibold">Your invite link</p>
-        <p className="mt-0.5 text-sm text-mute">Send it so friends can join this round too.</p>
-        <div className="mt-3 flex gap-2">
-          <div className="flex min-w-0 flex-1 items-center rounded-xl border border-line bg-ink px-3 py-3">
-            <span className="truncate text-sm text-soft" title={link}>
-              {link.replace(/^https?:\/\//, "")}
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => void onCopy()}
-            aria-label="Copy your invite link"
-            className="inline-flex w-28 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-ember font-semibold text-ink"
-          >
-            {copyState === "ok" ? (
-              <>
-                <Check className="h-4 w-4" strokeWidth={3} /> Copied
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4" /> Copy
-              </>
-            )}
-          </button>
-        </div>
-        <p role="status" className="mt-2 min-h-5 text-xs text-danger">
-          {copyState === "fail" ? "Your browser blocked copying. Press and hold the link to copy it." : ""}
-        </p>
-        <p className="text-xs leading-relaxed text-mute">One credit per X account. Accounts are checked before credits are issued.</p>
+        <ShareKit handle={handle} doneCount={doneCount} complete pendingUsd={round.rewardUsd} />
       </div>
     </div>
   );

@@ -263,12 +263,12 @@ export function isHandle(raw: string) {
   return HANDLE_RE.test(raw.trim());
 }
 
-export function inviteLink(handle: string, path: string) {
-  if (typeof window === "undefined" || !handle) return "";
-  const url = new URL(window.location.href);
-  url.pathname = path;
-  url.search = "";
-  url.hash = "";
-  url.searchParams.set("ref", handle);
-  return url.toString();
+export const shareOrigin = "https://clawcash.vercel.app";
+export const shareImage = `${shareOrigin}/og.jpg`;
+export const filmVideo = `${shareOrigin}/collection/orbit.mp4`;
+
+export function inviteLink(handle: string, _path?: string) {
+  const name = normalizeHandle(handle);
+  if (!name || !isHandle(name)) return "";
+  return `${shareOrigin}/r/${encodeURIComponent(name)}`;
 }

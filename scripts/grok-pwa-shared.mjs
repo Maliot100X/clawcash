@@ -14,14 +14,23 @@ const SHARE_META_KEYS = new Set([
   "og:title",
   "og:description",
   "og:image",
+  "og:image:secure_url",
+  "og:image:type",
   "og:image:width",
   "og:image:height",
+  "og:image:alt",
   "og:type",
   "og:url",
   "og:site_name",
+  "og:video",
+  "og:video:secure_url",
+  "og:video:type",
+  "og:video:width",
+  "og:video:height",
   "twitter:card",
   "twitter:title",
   "twitter:image",
+  "twitter:image:alt",
   "twitter:description",
   "x:game:image",
   "x:game:image:width",
@@ -135,6 +144,18 @@ export function resolvePublicHost(hostHeader) {
     explicitShareHost() ||
     publicAppHost(hostHeader)
   );
+}
+
+const REF_HANDLE = /^[A-Za-z0-9_]{1,15}$/;
+
+/** Referral identity from `/r/:handle` or `?ref=`, used to pin the share card. */
+export function referralFromRequest(pagePath = "", pageSearch = "") {
+  const search = String(pageSearch ?? "");
+  const params = new URLSearchParams(search.startsWith("?") ? search.slice(1) : search);
+  const queryRef = params.get("ref") ?? "";
+  if (REF_HANDLE.test(queryRef)) return queryRef;
+  const match = String(pagePath ?? "").match(/^\/r\/([A-Za-z0-9_]{1,15})\/?$/);
+  return match?.[1] ?? "";
 }
 
 export function isInstallQuery(url) {
@@ -366,6 +387,8 @@ export function grokOgHeadTags({
   site = {},
   documentTitle = "",
   cwd = process.cwd(),
+  pagePath = "",
+  pageSearch = "",
 } = {}) {
   const title = resolveOgTitle(site, appName, host, documentTitle);
   const publicHost = resolvePublicHost(host);
@@ -388,14 +411,38 @@ export function grokOgHeadTags({
       : `${ogServiceUrl()}/v1/card.png?host=${encodeURIComponent(publicHost)}&title=${encodeURIComponent(title)}`;
     const color = !custom ? placeholderCardColor(site) : "";
     if (color) image += `&color=${encodeURIComponent(color)}`;
+    const ref = referralFromRequest(pagePath, pageSearch);
+    const path = String(pagePath || "/") || "/";
+    const barePath = path.split("?")[0] || "/";
+    const canonicalPath = ref
+      ? `/r/${encodeURIComponent(ref)}`
+      : barePath.startsWith("/")
+        ? barePath
+        : `/${barePath}`;
+    tags.push(`<meta property="og:url" content="${escapeHtml(`https://${publicHost}${canonicalPath === "/" ? "/" : canonicalPath}`)}">`);
+    const alt = `${title} share card`;
+    const imageType = image.split("?")[0].endsWith(".png") ? "image/png" : "image/jpeg";
     tags.push(`<meta property="og:image" content="${escapeHtml(image)}">`);
+    tags.push(`<meta property="og:image:secure_url" content="${escapeHtml(image)}">`);
+    tags.push(`<meta property="og:image:type" content="${imageType}">`);
     tags.push(`<meta property="og:image:width" content="1200">`);
     tags.push(`<meta property="og:image:height" content="630">`);
+    tags.push(`<meta property="og:image:alt" content="${escapeHtml(alt)}">`);
+    tags.push(`<link rel="image_src" href="${escapeHtml(image)}">`);
     tags.push(`<meta name="twitter:title" content="${escapeHtml(title)}">`);
     if (description) {
       tags.push(`<meta name="twitter:description" content="${escapeHtml(description)}">`);
     }
     tags.push(`<meta name="twitter:image" content="${escapeHtml(image)}">`);
+    tags.push(`<meta name="twitter:image:alt" content="${escapeHtml(alt)}">`);
+    if (barePath === "/collection") {
+      const video = `https://${publicHost}/collection/orbit.mp4`;
+      tags.push(`<meta property="og:video" content="${escapeHtml(video)}">`);
+      tags.push(`<meta property="og:video:secure_url" content="${escapeHtml(video)}">`);
+      tags.push(`<meta property="og:video:type" content="video/mp4">`);
+      tags.push(`<meta property="og:video:width" content="1280">`);
+      tags.push(`<meta property="og:video:height" content="720">`);
+    }
     const banner = String(site.banner ?? "").trim();
     if (banner) {
       const bannerUrl = `https://${publicHost}${banner.startsWith("/") ? banner : `/${banner}`}`;
@@ -415,7 +462,9 @@ function stripGrokExtensionsScript(html) {
 }
 
 export function stripShareMetaTags(html) {
-  return String(html).replace(/<meta\b[^>]*>/gi, (tag) => {
+  return String(html)
+    .replace(/<link\b[^>]*\brel\s*=\s*["']image_src["'][^>]*>/gi, "")
+    .replace(/<meta\b[^>]*>/gi, (tag) => {
     const attrs = [...tag.matchAll(/\b(?:property|name)\s*=\s*["']([^"']+)["']/gi)];
     for (const match of attrs) {
       if (SHARE_META_KEYS.has(String(match[1]).toLowerCase())) return "";
@@ -458,12 +507,14 @@ export function normalizeHeadContext(ctx = {}) {
     host: ctx.host ?? "",
     cwd,
     site,
+    pagePath: ctx.pagePath ?? "",
+    pageSearch: ctx.pageSearch ?? "",
   };
 }
 
 export function injectGrokPwaHead(html, ctx = {}) {
   if (typeof html !== "string") return html;
-  const { site, projectId, creator, creatorId, host, cwd } = normalizeHeadContext(ctx);
+  const { site, projectId, creator, creatorId, host, cwd, pagePath, pageSearch } = normalizeHeadContext(ctx);
   const documentTitle = titleFromDocument(html);
   const appName = resolveOgTitle(
     site,
@@ -484,7 +535,7 @@ export function injectGrokPwaHead(html, ctx = {}) {
 
   next = insertAfterHeadOpen(
     next,
-    grokOgHeadTags({ host, appName, site, documentTitle, cwd }).join(""),
+    grokOgHeadTags({ host, appName, site, documentTitle, cwd, pagePath, pageSearch }).join(""),
   );
 
   if (readGrokExtensionsEnabled() && !next.includes("/grok-app-builder/extensions.js")) {
@@ -538,6 +589,8 @@ export function createHeadInjector(ctx = {}) {
       host: normalized.host,
       cwd: normalized.cwd,
       site: normalized.site,
+      pagePath: normalized.pagePath,
+      pageSearch: normalized.pageSearch,
     });
 
   return {

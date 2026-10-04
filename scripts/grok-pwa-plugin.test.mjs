@@ -12,6 +12,7 @@ import {
   isDocumentPath,
   isInstallQuery,
   publicAppHost,
+  referralFromRequest,
   renderWebManifest,
   resolveOgCardAsset,
   snapshotOgIdentity,
@@ -487,6 +488,40 @@ test("names the install page from host slug", () => {
   assert.equal(appNameFromHost("localhost:8080"), "Grok App");
   assert.equal(appNameFromHost("172.17.154.217:8080"), "Grok App");
   assert.equal(appNameFromHost("wild-race.grok.me"), "Wild Race");
+});
+
+test("referral pages pin og:url and the share image to that handle", () => {
+  const prevHost = process.env.VITE_PUBLIC_HOSTNAME;
+  const prevShare = process.env.VITE_SHARE_ORIGIN;
+  delete process.env.VITE_PUBLIC_HOSTNAME;
+  process.env.VITE_SHARE_ORIGIN = "https://clawcash.vercel.app";
+  try {
+    const out = injectGrokPwaHead("<html><head><title>ClawCash</title></head></html>", {
+      host: "preview-abc.vercel.app",
+      cwd: join(dirname(fileURLToPath(import.meta.url)), ".."),
+      pagePath: "/r/ada",
+      site: { title: "ClawCash", description: "Trading", card: "custom", image: "/og.jpg" },
+    });
+    assert.match(out, /property="og:url" content="https:\/\/clawcash\.vercel\.app\/r\/ada"/);
+    assert.match(out, /property="og:image" content="https:\/\/clawcash\.vercel\.app\/og\.jpg"/);
+    assert.match(out, /name="twitter:image" content="https:\/\/clawcash\.vercel\.app\/og\.jpg"/);
+    assert.equal(out.includes("og.jpg?ref="), false);
+    assert.equal(referralFromRequest("/r/ada", ""), "ada");
+    assert.equal(referralFromRequest("/", "?ref=bea"), "bea");
+    const film = injectGrokPwaHead("<html><head><title>ClawCash</title></head></html>", {
+      host: "preview-abc.vercel.app",
+      cwd: join(dirname(fileURLToPath(import.meta.url)), ".."),
+      pagePath: "/collection",
+      site: { title: "ClawCash", description: "Trading", card: "custom", image: "/og.jpg" },
+    });
+    assert.match(film, /property="og:video" content="https:\/\/clawcash\.vercel\.app\/collection\/orbit\.mp4"/);
+    assert.match(film, /property="og:video:type" content="video\/mp4"/);
+  } finally {
+    if (prevHost === undefined) delete process.env.VITE_PUBLIC_HOSTNAME;
+    else process.env.VITE_PUBLIC_HOSTNAME = prevHost;
+    if (prevShare === undefined) delete process.env.VITE_SHARE_ORIGIN;
+    else process.env.VITE_SHARE_ORIGIN = prevShare;
+  }
 });
 
 test("rejects hosts that are not plain slugs", () => {

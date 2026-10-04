@@ -43,7 +43,28 @@ function readStored(key: string): CampaignState {
   }
 }
 
-export function useCampaign(round: Round) {
+const SHARED_REF = "clawcash_referrer_v1";
+
+function readSharedRef() {
+  try {
+    const value = localStorage.getItem(SHARED_REF) ?? "";
+    return isHandle(value) ? normalizeHandle(value) : "";
+  } catch {
+    return "";
+  }
+}
+
+function writeSharedRef(name: string) {
+  try {
+    if (name && isHandle(name) && !localStorage.getItem(SHARED_REF)) {
+      localStorage.setItem(SHARED_REF, normalizeHandle(name));
+    }
+  } catch {
+    /* private mode */
+  }
+}
+
+export function useCampaign(round: Round, refHandle?: string) {
   const [state, setState] = useState<CampaignState>(emptyState);
   const [ready, setReady] = useState(false);
 
@@ -51,25 +72,24 @@ export function useCampaign(round: Round) {
     const stored = readStored(round.storageKey);
     try {
       const url = new URL(window.location.href);
-      const ref = url.searchParams.get("ref");
-      if (ref && isHandle(ref)) {
-        const name = normalizeHandle(ref);
-        if (!stored.referrer && name.toLowerCase() !== stored.handle.toLowerCase()) {
-          stored.referrer = name;
-        }
+      const fromPath = refHandle && isHandle(refHandle) ? normalizeHandle(refHandle) : "";
+      const fromQuery = url.searchParams.get("ref");
+      const raw = fromPath || (fromQuery && isHandle(fromQuery) ? normalizeHandle(fromQuery) : "");
+      const shared = readSharedRef();
+      const incoming = raw || (!stored.referrer ? shared : "");
+      if (incoming && incoming.toLowerCase() !== stored.handle.toLowerCase()) {
+        if (!stored.referrer) stored.referrer = incoming;
+        writeSharedRef(stored.referrer);
+      } else if (stored.referrer) {
+        writeSharedRef(stored.referrer);
       }
       localStorage.setItem(round.storageKey, JSON.stringify(stored));
-      if (ref !== null) {
-        url.searchParams.delete("ref");
-        const next = url.pathname + (url.search ? url.search : "") + url.hash;
-        window.history.replaceState(window.history.state, "", next);
-      }
     } catch {
       /* ignore malformed urls or private mode */
     }
     setState(stored);
     setReady(true);
-  }, [round.storageKey]);
+  }, [round.storageKey, refHandle]);
 
   useEffect(() => {
     if (!ready) return;
@@ -81,11 +101,20 @@ export function useCampaign(round: Round) {
   }, [state, ready, round.storageKey]);
 
   const setHandle = useCallback((handle: string) => {
-    setState((prev) => ({
-      ...prev,
-      handle,
-      referrer: prev.referrer.toLowerCase() === handle.toLowerCase() ? "" : prev.referrer,
-    }));
+    setState((prev) => {
+      if (handle && readSharedRef().toLowerCase() === handle.toLowerCase()) {
+        try {
+          localStorage.removeItem(SHARED_REF);
+        } catch {
+          /* private mode */
+        }
+      }
+      return {
+        ...prev,
+        handle,
+        referrer: prev.referrer.toLowerCase() === handle.toLowerCase() ? "" : prev.referrer,
+      };
+    });
   }, []);
 
   const markOpened = useCallback((id: TaskId) => {

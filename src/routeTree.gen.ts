@@ -15,11 +15,14 @@ import { Route as ArenaRouteImport } from './routes/arena'
 import { Route as ClaimRouteImport } from './routes/claim'
 import { Route as CollectionRouteImport } from './routes/collection'
 import { Route as LaunchRouteImport } from './routes/launch'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as TokenRouteImport } from './routes/token'
 import { Route as WorldRouteImport } from './routes/world'
 import { Route as ApiAgentsRouteImport } from './routes/api/agents'
 import { Route as ApiAvatarModelRouteImport } from './routes/api/avatar-model'
+import { Route as ApiLeaderboardRouteImport } from './routes/api/leaderboard'
+import { Route as RHandleRouteImport } from './routes/r/$handle'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +54,11 @@ const LaunchRoute = LaunchRouteImport.update({
   path: '/launch',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
   path: '/setup',
@@ -76,6 +84,16 @@ const ApiAvatarModelRoute = ApiAvatarModelRouteImport.update({
   path: '/api/avatar-model',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLeaderboardRoute = ApiLeaderboardRouteImport.update({
+  id: '/api/leaderboard',
+  path: '/api/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RHandleRoute = RHandleRouteImport.update({
+  id: '/r/$handle',
+  path: '/r/$handle',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -84,11 +102,14 @@ export interface FileRoutesByFullPath {
   '/claim': typeof ClaimRoute
   '/collection': typeof CollectionRoute
   '/launch': typeof LaunchRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/setup': typeof SetupRoute
   '/token': typeof TokenRoute
   '/world': typeof WorldRoute
   '/api/agents': typeof ApiAgentsRoute
   '/api/avatar-model': typeof ApiAvatarModelRoute
+  '/api/leaderboard': typeof ApiLeaderboardRoute
+  '/r/$handle': typeof RHandleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -97,11 +118,14 @@ export interface FileRoutesByTo {
   '/claim': typeof ClaimRoute
   '/collection': typeof CollectionRoute
   '/launch': typeof LaunchRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/setup': typeof SetupRoute
   '/token': typeof TokenRoute
   '/world': typeof WorldRoute
   '/api/agents': typeof ApiAgentsRoute
   '/api/avatar-model': typeof ApiAvatarModelRoute
+  '/api/leaderboard': typeof ApiLeaderboardRoute
+  '/r/$handle': typeof RHandleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -111,11 +135,14 @@ export interface FileRoutesById {
   '/claim': typeof ClaimRoute
   '/collection': typeof CollectionRoute
   '/launch': typeof LaunchRoute
+  '/leaderboard': typeof LeaderboardRoute
   '/setup': typeof SetupRoute
   '/token': typeof TokenRoute
   '/world': typeof WorldRoute
   '/api/agents': typeof ApiAgentsRoute
   '/api/avatar-model': typeof ApiAvatarModelRoute
+  '/api/leaderboard': typeof ApiLeaderboardRoute
+  '/r/$handle': typeof RHandleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -126,11 +153,14 @@ export interface FileRouteTypes {
     | '/claim'
     | '/collection'
     | '/launch'
+    | '/leaderboard'
     | '/setup'
     | '/token'
     | '/world'
     | '/api/agents'
     | '/api/avatar-model'
+    | '/api/leaderboard'
+    | '/r/$handle'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -139,11 +169,14 @@ export interface FileRouteTypes {
     | '/claim'
     | '/collection'
     | '/launch'
+    | '/leaderboard'
     | '/setup'
     | '/token'
     | '/world'
     | '/api/agents'
     | '/api/avatar-model'
+    | '/api/leaderboard'
+    | '/r/$handle'
   id:
     | '__root__'
     | '/'
@@ -152,11 +185,14 @@ export interface FileRouteTypes {
     | '/claim'
     | '/collection'
     | '/launch'
+    | '/leaderboard'
     | '/setup'
     | '/token'
     | '/world'
     | '/api/agents'
     | '/api/avatar-model'
+    | '/api/leaderboard'
+    | '/r/$handle'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -166,11 +202,14 @@ export interface RootRouteChildren {
   ClaimRoute: typeof ClaimRoute
   CollectionRoute: typeof CollectionRoute
   LaunchRoute: typeof LaunchRoute
+  LeaderboardRoute: typeof LeaderboardRoute
   SetupRoute: typeof SetupRoute
   TokenRoute: typeof TokenRoute
   WorldRoute: typeof WorldRoute
   ApiAgentsRoute: typeof ApiAgentsRoute
   ApiAvatarModelRoute: typeof ApiAvatarModelRoute
+  ApiLeaderboardRoute: typeof ApiLeaderboardRoute
+  RHandleRoute: typeof RHandleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -217,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LaunchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/setup': {
       id: '/setup'
       path: '/setup'
@@ -252,6 +298,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAvatarModelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/leaderboard': {
+      id: '/api/leaderboard'
+      path: '/api/leaderboard'
+      fullPath: '/api/leaderboard'
+      preLoaderRoute: typeof ApiLeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/r/$handle': {
+      id: '/r/$handle'
+      path: '/r/$handle'
+      fullPath: '/r/$handle'
+      preLoaderRoute: typeof RHandleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -262,11 +322,14 @@ const rootRouteChildren: RootRouteChildren = {
   ClaimRoute: ClaimRoute,
   CollectionRoute: CollectionRoute,
   LaunchRoute: LaunchRoute,
+  LeaderboardRoute: LeaderboardRoute,
   SetupRoute: SetupRoute,
   TokenRoute: TokenRoute,
   WorldRoute: WorldRoute,
   ApiAgentsRoute: ApiAgentsRoute,
   ApiAvatarModelRoute: ApiAvatarModelRoute,
+  ApiLeaderboardRoute: ApiLeaderboardRoute,
+  RHandleRoute: RHandleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

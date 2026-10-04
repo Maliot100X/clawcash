@@ -102,9 +102,12 @@ function wrapHtmlResponses(middlewares, cwd) {
     const originalWrite = res.write.bind(res);
     const originalEnd = res.end.bind(res);
     const host = requestHost(req);
+    const queryAt = rawUrl.indexOf("?");
     const injector = createHeadInjector({
       host,
       cwd,
+      pagePath: pathOnly,
+      pageSearch: queryAt === -1 ? "" : rawUrl.slice(queryAt),
     });
     let mode = null; // null = undecided, "inject" | "passthrough"
 
