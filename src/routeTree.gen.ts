@@ -20,6 +20,7 @@ import { Route as SetupRouteImport } from './routes/setup'
 import { Route as TokenRouteImport } from './routes/token'
 import { Route as WorldRouteImport } from './routes/world'
 import { Route as ApiAgentsRouteImport } from './routes/api/agents'
+import { Route as ApiAssistantGrantRouteImport } from './routes/api/assistant-grant'
 import { Route as ApiAvatarModelRouteImport } from './routes/api/avatar-model'
 import { Route as ApiLeaderboardRouteImport } from './routes/api/leaderboard'
 import { Route as RHandleRouteImport } from './routes/r/$handle'
@@ -79,6 +80,11 @@ const ApiAgentsRoute = ApiAgentsRouteImport.update({
   path: '/api/agents',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAssistantGrantRoute = ApiAssistantGrantRouteImport.update({
+  id: '/api/assistant-grant',
+  path: '/api/assistant-grant',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAvatarModelRoute = ApiAvatarModelRouteImport.update({
   id: '/api/avatar-model',
   path: '/api/avatar-model',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/token': typeof TokenRoute
   '/world': typeof WorldRoute
   '/api/agents': typeof ApiAgentsRoute
+  '/api/assistant-grant': typeof ApiAssistantGrantRoute
   '/api/avatar-model': typeof ApiAvatarModelRoute
   '/api/leaderboard': typeof ApiLeaderboardRoute
   '/r/$handle': typeof RHandleRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/token': typeof TokenRoute
   '/world': typeof WorldRoute
   '/api/agents': typeof ApiAgentsRoute
+  '/api/assistant-grant': typeof ApiAssistantGrantRoute
   '/api/avatar-model': typeof ApiAvatarModelRoute
   '/api/leaderboard': typeof ApiLeaderboardRoute
   '/r/$handle': typeof RHandleRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/token': typeof TokenRoute
   '/world': typeof WorldRoute
   '/api/agents': typeof ApiAgentsRoute
+  '/api/assistant-grant': typeof ApiAssistantGrantRoute
   '/api/avatar-model': typeof ApiAvatarModelRoute
   '/api/leaderboard': typeof ApiLeaderboardRoute
   '/r/$handle': typeof RHandleRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/token'
     | '/world'
     | '/api/agents'
+    | '/api/assistant-grant'
     | '/api/avatar-model'
     | '/api/leaderboard'
     | '/r/$handle'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/token'
     | '/world'
     | '/api/agents'
+    | '/api/assistant-grant'
     | '/api/avatar-model'
     | '/api/leaderboard'
     | '/r/$handle'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/token'
     | '/world'
     | '/api/agents'
+    | '/api/assistant-grant'
     | '/api/avatar-model'
     | '/api/leaderboard'
     | '/r/$handle'
@@ -207,6 +219,7 @@ export interface RootRouteChildren {
   TokenRoute: typeof TokenRoute
   WorldRoute: typeof WorldRoute
   ApiAgentsRoute: typeof ApiAgentsRoute
+  ApiAssistantGrantRoute: typeof ApiAssistantGrantRoute
   ApiAvatarModelRoute: typeof ApiAvatarModelRoute
   ApiLeaderboardRoute: typeof ApiLeaderboardRoute
   RHandleRoute: typeof RHandleRoute
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAgentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/assistant-grant': {
+      id: '/api/assistant-grant'
+      path: '/api/assistant-grant'
+      fullPath: '/api/assistant-grant'
+      preLoaderRoute: typeof ApiAssistantGrantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/avatar-model': {
       id: '/api/avatar-model'
       path: '/api/avatar-model'
@@ -327,6 +347,7 @@ const rootRouteChildren: RootRouteChildren = {
   TokenRoute: TokenRoute,
   WorldRoute: WorldRoute,
   ApiAgentsRoute: ApiAgentsRoute,
+  ApiAssistantGrantRoute: ApiAssistantGrantRoute,
   ApiAvatarModelRoute: ApiAvatarModelRoute,
   ApiLeaderboardRoute: ApiLeaderboardRoute,
   RHandleRoute: RHandleRoute,
