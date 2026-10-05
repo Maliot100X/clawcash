@@ -37,6 +37,11 @@ import {
 import { askClaw, guidePrompts } from "@/lib/assistant";
 import { useCampaign, useCountUp } from "@/lib/use-campaign";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type TabId = "campaign" | "reward" | "mainnet";
 type SectionId = "home" | "tasks" | "mainnet" | "reward" | "you";
@@ -248,7 +253,10 @@ export function CampaignApp({ round, refHandle }: { round: Round; refHandle?: st
                 What arrives at mainnet
               </Button>
             </div>
-            <p className="mt-5 text-sm text-mute">Trading is not live yet. No deposits, no wallet needed.</p>
+            <Alert className="mt-5 max-w-xl">
+              <AlertTitle>Trading is not live</AlertTitle>
+              <AlertDescription>No deposits, and no wallet is needed.</AlertDescription>
+            </Alert>
             <div className="mt-4 flex flex-wrap gap-2">
               {guidePrompts.map((item) => (
                 <button
@@ -304,51 +312,25 @@ export function CampaignApp({ round, refHandle }: { round: Round; refHandle?: st
               ))}
             </div>
 
-            <div
-              role="tablist"
-              aria-label="Campaign"
-              className="mt-7 grid grid-cols-3 border-b border-line"
-              onKeyDown={(event) => {
-                const ids: TabId[] = ["campaign", "reward", "mainnet"];
-                const index = ids.indexOf(tab);
-                if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-                  event.preventDefault();
-                  const next = event.key === "ArrowRight" ? (index + 1) % 3 : (index + 2) % 3;
-                  setTab(ids[next] ?? "campaign");
-                }
-              }}
-            >
-              {(
-                [
-                  ["campaign", "Campaign"],
-                  ["reward", "Reward"],
-                  ["mainnet", "Mainnet"],
-                ] as const
-              ).map(([id, label]) => (
-                <button
-                  key={id}
-                  id={`tab-${id}`}
-                  type="button"
-                  role="tab"
-                  aria-selected={tab === id}
-                  aria-controls={`panel-${id}`}
-                  tabIndex={tab === id ? 0 : -1}
-                  onClick={() => setTab(id)}
-                  className={`relative flex items-center justify-center gap-2 pb-3 pt-1 text-base font-semibold transition ${
-                    tab === id ? "text-bone" : "text-mute hover:text-soft"
-                  }`}
-                >
-                  {label}
-                  {id === "mainnet" ? (
-                    <span className="rounded-md bg-ember/15 px-1.5 py-0.5 text-xs font-semibold text-ember">Soon</span>
-                  ) : null}
-                  {tab === id ? <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-ember" /> : null}
-                </button>
-              ))}
-            </div>
-            <div className="pt-5" id={`panel-${tab}`} role="tabpanel" aria-labelledby={`tab-${tab}`}>
-              {ready ? panels[tab] : <CardSkeleton />}
-            </div>
+            <Tabs value={tab} onValueChange={(value) => setTab(value as TabId)} className="mt-7">
+              <TabsList variant="line" className="w-full">
+                <TabsTrigger value="campaign">Campaign</TabsTrigger>
+                <TabsTrigger value="reward">Reward</TabsTrigger>
+                <TabsTrigger value="mainnet">
+                  Mainnet
+                  <Badge variant="secondary">Soon</Badge>
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="campaign" className="pt-5">
+                {ready && tab === "campaign" ? panels.campaign : tab === "campaign" ? <CardSkeleton /> : null}
+              </TabsContent>
+              <TabsContent value="reward" className="pt-5">
+                {ready && tab === "reward" ? panels.reward : tab === "reward" ? <CardSkeleton /> : null}
+              </TabsContent>
+              <TabsContent value="mainnet" className="pt-5">
+                {ready && tab === "mainnet" ? panels.mainnet : tab === "mainnet" ? <CardSkeleton /> : null}
+              </TabsContent>
+            </Tabs>
           </div>
         </section>
 
@@ -635,13 +617,8 @@ function TaskPanel({
       )}
 
       <div className="flex items-center gap-3 px-1 pt-1">
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
-          <div
-            className="h-full rounded-full bg-gain shadow-[0_0_12px_var(--color-gain)] transition-[width] duration-300"
-            style={{ width: `${(doneCount / tasks.length) * 100}%` }}
-          />
-        </div>
-        <p className="text-sm text-soft tabular-nums" aria-live="polite">
+        <Progress value={(doneCount / tasks.length) * 100} className="flex-1" />
+        <p className="text-sm text-muted-foreground tabular-nums" aria-live="polite">
           {doneCount} of {tasks.length} done
         </p>
       </div>
@@ -899,10 +876,10 @@ function Faq({ round }: { round: Round }) {
 
 function CardSkeleton() {
   return (
-    <div className="space-y-3" aria-hidden="true">
-      <div className="h-24 rounded-2xl bg-panel" />
-      <div className="h-16 rounded-2xl bg-panel" />
-      <div className="h-16 rounded-2xl bg-panel" />
+    <div className="flex flex-col gap-3" aria-hidden="true">
+      <Skeleton className="h-24 w-full" />
+      <Skeleton className="h-16 w-full" />
+      <Skeleton className="h-16 w-full" />
     </div>
   );
 }

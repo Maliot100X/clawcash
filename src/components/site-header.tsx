@@ -3,6 +3,7 @@ import { brand, roundList, type RoundId } from "@/lib/campaigns";
 import { ClawMark, XMark } from "@/components/claw-mark";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export type NavId = RoundId | "arena" | "collection" | "token" | "launch" | "world" | "setup" | "board";
@@ -49,10 +50,12 @@ export function SiteHeader({ active }: { active: NavId }) {
           ))}
         </nav>
         <div className="hidden items-center gap-2 lg:flex">
-          <Badge variant="outline" className="h-9 px-3 text-sm text-soft">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-            Pre-mainnet
-          </Badge>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge variant="outline">Pre-mainnet</Badge>
+            </TooltipTrigger>
+            <TooltipContent>Trading is not live. Nothing can be deposited.</TooltipContent>
+          </Tooltip>
           <a href={brand.profile} target="_blank" rel="noopener noreferrer" className={cn(buttonVariants({ size: "sm" }), "bg-foreground text-background hover:bg-soft")}>
             <XMark />
             Follow

@@ -2,6 +2,7 @@ import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-r
 import { AuthProvider } from "@/lib/auth/provider";
 import { ClawAssistant } from "@/components/claw-assistant";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import appCss from "../styles.css?url";
 
 export const Route = createRootRoute({
@@ -31,8 +32,10 @@ export const Route = createRootRoute({
       <body className="bg-ink font-sans text-bone">
         <PreviewHostBridge />
         <AuthProvider>
-          <Outlet />
-          <ClawAssistant />
+          <TooltipProvider>
+            <Outlet />
+            <ClawAssistant />
+          </TooltipProvider>
         </AuthProvider>
         <Scripts />
       </body>

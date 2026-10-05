@@ -40,6 +40,19 @@
   --shadow-dock: 0 18px 50px -24px rgb(0 0 0 / 0.85);
 }
 
+:root {
+  --radius: 0.85rem;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {
