@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Mic, Send, X } from "lucide-react";
 import { ClawMark } from "@/components/claw-mark";
-import { assistantFunctions, assistantPrompt } from "@/lib/assistant";
+import { assistantFunctions, assistantPrompt, guidePrompts, viewerSnapshot } from "@/lib/assistant";
 
 type Role = "user" | "assistant";
 type Line = { id: number; role: Role; text: string };
@@ -232,6 +232,27 @@ export function ClawAssistant() {
   async function answerCall(socket: WebSocket, message: CallRequest) {
     for (const call of message.functions ?? []) {
       let content = '{"error":"unknown"}';
+      if (call.name === "my_progress") {
+        const local = viewerSnapshot();
+        try {
+          const response = await fetch("/api/leaderboard", { cache: "no-store" });
+          const board = (await response.json()) as {
+            players?: Array<{ rank: number; handle: string; tasksDone: number; refs: number; score: number; earnedUsd: number; complete: boolean }>;
+          };
+          const row = local.handle
+            ? (board.players ?? []).find((player) => player.handle.toLowerCase() === local.handle.toLowerCase())
+            : undefined;
+          content = JSON.stringify({
+            handle: local.handle || null,
+            markedInBrowser: local.rounds,
+            board: row
+              ? { rank: row.rank, tasks: row.tasksDone, refs: row.refs, score: row.score, collected: row.earnedUsd, complete: row.complete }
+              : null,
+          });
+        } catch {
+          content = JSON.stringify({ handle: local.handle || null, markedInBrowser: local.rounds, board: null });
+        }
+      }
       if (call.name === "live_board") {
         try {
           const response = await fetch("/api/leaderboard", { cache: "no-store" });
@@ -311,10 +332,11 @@ export function ClawAssistant() {
     }
   }
 
-  async function sendText() {
-    const text = draft.trim();
+  async function sendText(next?: string) {
+    const text = (next ?? draft).trim();
     if (!text) return;
-    setDraft("");
+    if (!next) setDraft("");
+    else setDraft("");
     push("user", text);
     try {
       if (!socketRef.current || !ready.current) {
@@ -328,30 +350,56 @@ export function ClawAssistant() {
     }
   }
 
+  useEffect(() => {
+    function onAsk(event: Event) {
+      const text = String((event as CustomEvent<string>).detail ?? "").trim();
+      if (!text) return;
+      setOpen(true);
+      void sendText(text);
+    }
+    window.addEventListener("claw-ask", onAsk);
+    return () => window.removeEventListener("claw-ask", onAsk);
+  }, []);
+
   return (
     <div className="fixed right-4 bottom-24 z-50 lg:right-6 lg:bottom-6">
       {open ? (
         <section
-          className="mb-3 flex h-[min(34rem,70dvh)] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-ember/40 bg-ink/95 shadow-dock backdrop-blur-xl"
+          className="mb-3 flex h-[min(36rem,74dvh)] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-line bg-ink/95 shadow-dock ring-1 ring-bone/10 backdrop-blur-xl"
           aria-label="CLAW assistant"
         >
           <header className="flex items-center gap-3 border-b border-line px-4 py-3">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-ember/15">
+            <span className={`grid h-10 w-10 place-items-center rounded-2xl bg-ember/15 ring-1 ring-ember/30 ${listening ? "animate-pulse" : ""}`}>
               <ClawMark className="h-7 w-7" />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold">CLAW</p>
-              <p className="text-xs text-mute">{phase === "live" ? (listening ? "Listening" : "On the line") : phase === "connecting" ? "Connecting" : "Text or talk"}</p>
+              <p className="font-semibold leading-none">CLAW</p>
+              <p className="mt-1 text-xs text-mute">{phase === "live" ? (listening ? "Listening" : "On the line") : phase === "connecting" ? "Connecting" : "Guide"}</p>
             </div>
+            <span className="rounded-full border border-line px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-gold">Live</span>
             <button type="button" onClick={() => { hangUp(); setOpen(false); }} className="grid h-9 w-9 place-items-center rounded-full text-soft hover:bg-bone/10" aria-label="Close CLAW">
               <X className="h-4 w-4" />
             </button>
           </header>
           <div ref={scroller} className="flex-1 space-y-2 overflow-y-auto px-4 py-4">
             {lines.length === 0 ? (
-              <p className="text-sm leading-relaxed text-soft">
-                Ask about the seven tasks, the $50 credit, your ref link, or the live $CLAWRENA price. I can talk back.
-              </p>
+              <div>
+                <p className="text-sm leading-relaxed text-soft">
+                  Tap a question or type your own. I can also talk.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {guidePrompts.map((item) => (
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={() => void sendText(item.text)}
+                      className="rounded-full border border-line bg-panel px-3 py-1.5 text-left text-xs font-semibold text-bone hover:border-ember/60 hover:bg-ember/10"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ) : null}
             {lines.map((line) => (
               <p
@@ -397,7 +445,7 @@ export function ClawAssistant() {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="ml-auto grid h-14 w-14 place-items-center rounded-full border border-ember/50 bg-ink shadow-ember"
+        className="ml-auto grid h-14 w-14 place-items-center rounded-2xl border border-ember/50 bg-ink shadow-ember ring-1 ring-bone/10"
         aria-label={open ? "Hide CLAW" : "Open CLAW"}
       >
         <ClawMark className="h-9 w-9" />

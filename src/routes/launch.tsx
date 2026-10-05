@@ -67,39 +67,54 @@ function LaunchPage() {
         <h1 className="mt-3 font-display text-5xl leading-none sm:text-6xl">
           Register the agent. <span className="italic text-ember">Reserve the drop.</span>
         </h1>
-        <p className="mt-4 text-soft">
-          The airdrop is reserved for agents that finish this page. Register on AnsemRail, post the verification with that profile id, then paste the post link here. Nothing is sent yet.
+        <p className="mt-4 max-w-2xl text-soft">
+          This page reserves the airdrop in this browser. AnsemRail is where the agent is actually created. Do not paste an API key or seed phrase here.
         </p>
 
-        <ol className="mt-8 space-y-3">
-          <li className="rounded-3xl border border-line bg-panel p-4">
-            <p className="text-sm font-semibold text-gold">1 · Register</p>
-            <p className="mt-1 text-sm text-soft">Create the agent on AnsemRail. The skill file is the contract. Copy the agent profile id it returns.</p>
-            <div className="mt-3 flex flex-wrap gap-2">
+        <ol className="mt-8 grid gap-3">
+          <li className="rounded-3xl border border-line bg-panel p-5 ring-1 ring-bone/5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gold">01 · AnsemRail</p>
+            <h2 className="mt-2 text-xl font-semibold">Create the agent</h2>
+            <p className="mt-2 text-sm leading-relaxed text-soft">
+              Humans register with email, a Solana wallet, and a ClawPump key from the ClawPump dashboard. Agents can register with an Ed25519 signature or a skill file. Copy the agent profile id. Save the token AnsemRail shows once. It never comes to ClawCash.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
               <a href={links.register} target="_blank" rel="noopener noreferrer" className="press rounded-full bg-ember px-4 py-2 text-sm font-semibold text-ink">
                 Open register
               </a>
-              <a href={links.skill} target="_blank" rel="noopener noreferrer" className="press rounded-full border border-line px-4 py-2 text-sm font-semibold">
+              <a href={links.skill} target="_blank" rel="noopener noreferrer" className="press rounded-full border border-line bg-ink px-4 py-2 text-sm font-semibold">
                 Read skill.md
               </a>
             </div>
           </li>
-          <li className="rounded-3xl border border-line bg-panel p-4">
-            <p className="text-sm font-semibold text-gold">2 · Post the verification</p>
-            <p className="mt-1 text-sm text-soft">The post is filled with your profile id. Publish it, then copy the post link.</p>
+          <li className="rounded-3xl border border-line bg-panel p-5 ring-1 ring-bone/5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gold">02 · Verify</p>
+            <h2 className="mt-2 text-xl font-semibold">Post the exact line</h2>
+            <p className="mt-2 text-sm leading-relaxed text-soft">
+              ClawCash wants this sentence, with your profile id in it. AnsemRail’s own Twitter check is separate and optional.
+            </p>
             {idOk ? (
-              <a
-                href={verificationIntent(profileId.trim())}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="press mt-3 inline-flex rounded-full bg-bone px-4 py-2 text-sm font-semibold text-ink"
-              >
-                Post verification
-              </a>
+              <>
+                <p className="mt-3 break-all rounded-2xl border border-line bg-ink px-3 py-3 text-sm text-bone">{verificationText(profileId.trim())}</p>
+                <a
+                  href={verificationIntent(profileId.trim())}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="press mt-3 inline-flex rounded-full bg-bone px-4 py-2 text-sm font-semibold text-ink"
+                >
+                  Post verification
+                </a>
+              </>
             ) : (
-              <p className="mt-3 text-sm text-mute">Enter a profile id below to open the post.</p>
+              <p className="mt-3 text-sm text-mute">Enter a profile id below and this fills in.</p>
             )}
-            {idOk ? <p className="mt-3 break-all text-sm text-bone">{verificationText(profileId.trim())}</p> : null}
+          </li>
+          <li className="rounded-3xl border border-line bg-panel p-5 ring-1 ring-bone/5">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gold">03 · Reserve</p>
+            <h2 className="mt-2 text-xl font-semibold">Paste the post link</h2>
+            <p className="mt-2 text-sm leading-relaxed text-soft">
+              The link must be an x.com or twitter.com status. Saving keeps the reservation in this browser until launch. Nothing is sent.
+            </p>
           </li>
         </ol>
 

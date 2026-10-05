@@ -34,6 +34,7 @@ import {
   type Round,
   type TaskId,
 } from "@/lib/campaigns";
+import { askClaw, guidePrompts } from "@/lib/assistant";
 import { useCampaign, useCountUp } from "@/lib/use-campaign";
 
 type TabId = "campaign" | "reward" | "mainnet";
@@ -246,6 +247,18 @@ export function CampaignApp({ round, refHandle }: { round: Round; refHandle?: st
               </button>
             </div>
             <p className="mt-5 text-sm text-mute">Trading is not live yet. No deposits, no wallet needed.</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {guidePrompts.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => askClaw(item.text)}
+                  className="rounded-full border border-line bg-card/80 px-3 py-1.5 text-xs font-semibold text-soft ring-1 ring-bone/5 hover:border-ember/50 hover:text-bone"
+                >
+                  Ask CLAW · {item.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div
