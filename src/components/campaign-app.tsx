@@ -36,6 +36,7 @@ import {
 } from "@/lib/campaigns";
 import { askClaw, guidePrompts } from "@/lib/assistant";
 import { useCampaign, useCountUp } from "@/lib/use-campaign";
+import { Button, buttonVariants } from "@/components/ui/button";
 
 type TabId = "campaign" | "reward" | "mainnet";
 type SectionId = "home" | "tasks" | "mainnet" | "reward" | "you";
@@ -235,16 +236,17 @@ export function CampaignApp({ round, refHandle }: { round: Round; refHandle?: st
               <ArrowUpRight className="h-4 w-4 shrink-0" />
             </a>
             <div className="mt-8 hidden flex-wrap gap-3 lg:flex">
-              <button type="button" onClick={openTasks} className="press rounded-2xl bg-ember px-6 py-4 text-base font-semibold text-ink shadow-ember hover:bg-ember-hi">
+              <Button type="button" size="lg" onClick={openTasks}>
                 {complete ? "View your credit" : "Join the campaign"}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                size="lg"
+                variant="outline"
                 onClick={() => document.getElementById("mainnet")?.scrollIntoView({ behavior: "smooth" })}
-                className="press rounded-2xl border border-line px-6 py-4 text-base font-semibold text-bone hover:border-soft hover:bg-bone/5"
               >
                 What arrives at mainnet
-              </button>
+              </Button>
             </div>
             <p className="mt-5 text-sm text-mute">Trading is not live yet. No deposits, no wallet needed.</p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -253,7 +255,7 @@ export function CampaignApp({ round, refHandle }: { round: Round; refHandle?: st
                   key={item.label}
                   type="button"
                   onClick={() => askClaw(item.text)}
-                  className="rounded-full border border-line bg-card/80 px-3 py-1.5 text-xs font-semibold text-soft ring-1 ring-bone/5 hover:border-ember/50 hover:text-bone"
+                  className={buttonVariants({ variant: "outline", size: "sm" })}
                 >
                   Ask CLAW · {item.label}
                 </button>
@@ -511,13 +513,9 @@ function Balance({
           </p>
         ) : null}
       </div>
-      <button
-        type="button"
-        onClick={onPrimary}
-        className="shrink-0 press rounded-3xl bg-ember px-6 py-4 text-base font-semibold text-ink shadow-ember hover:bg-ember-hi sm:px-8"
-      >
+      <Button type="button" size="lg" onClick={onPrimary} className="shrink-0">
         {label}
-      </button>
+      </Button>
     </div>
   );
 }

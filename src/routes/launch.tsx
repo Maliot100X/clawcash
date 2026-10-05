@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   isProfileId,
   isTweetUrl,
@@ -72,20 +75,24 @@ function LaunchPage() {
         </p>
 
         <ol className="mt-8 grid gap-3">
-          <li className="rounded-3xl border border-line bg-panel p-5 ring-1 ring-bone/5">
-            <p className="text-xs font-semibold uppercase tracking-widest text-gold">01 · AnsemRail</p>
-            <h2 className="mt-2 text-xl font-semibold">Create the agent</h2>
-            <p className="mt-2 text-sm leading-relaxed text-soft">
-              Humans register with email, a Solana wallet, and a ClawPump key from the ClawPump dashboard. Agents can register with an Ed25519 signature or a skill file. Copy the agent profile id. Save the token AnsemRail shows once. It never comes to ClawCash.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <a href={links.register} target="_blank" rel="noopener noreferrer" className="press rounded-full bg-ember px-4 py-2 text-sm font-semibold text-ink">
-                Open register
-              </a>
-              <a href={links.skill} target="_blank" rel="noopener noreferrer" className="press rounded-full border border-line bg-ink px-4 py-2 text-sm font-semibold">
-                Read skill.md
-              </a>
-            </div>
+          <li>
+            <Card>
+              <CardHeader>
+                <p className="text-xs font-semibold uppercase tracking-widest text-gold">01 · AnsemRail</p>
+                <CardTitle className="mt-2">Create the agent</CardTitle>
+                <CardDescription>
+                  Humans register with email, a Solana wallet, and a ClawPump key from the ClawPump dashboard. Agents can register with an Ed25519 signature or a skill file. Copy the agent profile id. Save the token AnsemRail shows once. It never comes to ClawCash.
+                </CardDescription>
+              </CardHeader>
+              <div className="flex flex-wrap gap-2 px-5 pb-5">
+                <a href={links.register} target="_blank" rel="noopener noreferrer" className={buttonVariants({ size: "sm" })}>
+                  Open register
+                </a>
+                <a href={links.skill} target="_blank" rel="noopener noreferrer" className={buttonVariants({ variant: "outline", size: "sm" })}>
+                  Read skill.md
+                </a>
+              </div>
+            </Card>
           </li>
           <li className="rounded-3xl border border-line bg-panel p-5 ring-1 ring-bone/5">
             <p className="text-xs font-semibold uppercase tracking-widest text-gold">02 · Verify</p>
@@ -122,7 +129,7 @@ function LaunchPage() {
           <label htmlFor="profile-id" className="block text-sm font-semibold">
             Agent profile id
           </label>
-          <input
+          <Input
             id="profile-id"
             value={profileId}
             onChange={(event) => {
@@ -132,12 +139,12 @@ function LaunchPage() {
             autoComplete="off"
             spellCheck={false}
             placeholder="from AnsemRail"
-            className="mt-2 w-full rounded-xl border border-line bg-ink px-3 py-3 text-base text-bone outline-none placeholder:text-mute focus:border-ember"
+            className="mt-2"
           />
           <label htmlFor="tweet-url" className="mt-4 block text-sm font-semibold">
             Verification post link
           </label>
-          <input
+          <Input
             id="tweet-url"
             value={tweetUrl}
             onChange={(event) => {
@@ -148,16 +155,16 @@ function LaunchPage() {
             autoComplete="off"
             spellCheck={false}
             placeholder="https://x.com/you/status/…"
-            className="mt-2 w-full rounded-xl border border-line bg-ink px-3 py-3 text-base text-bone outline-none placeholder:text-mute focus:border-ember"
+            className="mt-2"
           />
           {error ? (
             <p role="alert" className="mt-3 text-sm text-danger">
               {error}
             </p>
           ) : null}
-          <button type="submit" className="press mt-5 rounded-2xl bg-ember px-5 py-3 text-sm font-semibold text-ink shadow-ember">
+          <Button type="submit" className="mt-5">
             Save and reserve
-          </button>
+          </Button>
           {ready && saved ? (
             <p role="status" className="mt-4 text-sm text-gain">
               Airdrop reserved for agent {saved.profileId}. It is stored in this browser until launch. Nothing has been sent.

@@ -8,7 +8,11 @@ Live site: [clawcash.vercel.app](https://clawcash.vercel.app)
 
 ## Film
 
-[Play the orbit](https://clawcash.vercel.app/collection) · [orbit.mp4](public/collection/orbit.mp4)
+The orbit, six seconds. GitHub plays this copy inline.
+
+https://github.com/user-attachments/assets/a16c5cb8-e983-4a48-ba4e-6530bbc7d571
+
+[Open the collection](https://clawcash.vercel.app/collection)
 
 [![Planet](public/collection/planet.jpg)](https://clawcash.vercel.app/collection)
 

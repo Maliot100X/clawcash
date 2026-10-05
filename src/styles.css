@@ -17,6 +17,24 @@
   --color-gain: #3ddc97;
   --color-danger: #ff6b7a;
 
+  --color-background: #09090b;
+  --color-foreground: #f4ede4;
+  --color-primary: #ff4b1f;
+  --color-primary-foreground: #09090b;
+  --color-secondary: #1a1917;
+  --color-secondary-foreground: #f4ede4;
+  --color-muted: #1a1917;
+  --color-muted-foreground: #a39b90;
+  --color-accent: #241c19;
+  --color-accent-foreground: #f4ede4;
+  --color-destructive: #ff6b7a;
+  --color-border: #2e2c28;
+  --color-input: #2e2c28;
+  --color-ring: #ff4b1f;
+  --color-popover: #121214;
+  --color-popover-foreground: #f4ede4;
+  --color-card-foreground: #f4ede4;
+
   --radius-app: 2.25rem;
   --shadow-ember: 0 14px 34px -16px rgb(255 75 31 / 0.7);
   --shadow-dock: 0 18px 50px -24px rgb(0 0 0 / 0.85);

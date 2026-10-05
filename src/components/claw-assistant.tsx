@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Mic, Send, X } from "lucide-react";
 import { ClawMark } from "@/components/claw-mark";
 import { assistantFunctions, assistantPrompt, guidePrompts, viewerSnapshot } from "@/lib/assistant";
+import { buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type Role = "user" | "assistant";
 type Line = { id: number; role: Role; text: string };
@@ -393,7 +395,7 @@ export function ClawAssistant() {
                       key={item.label}
                       type="button"
                       onClick={() => void sendText(item.text)}
-                      className="rounded-full border border-line bg-panel px-3 py-1.5 text-left text-xs font-semibold text-bone hover:border-ember/60 hover:bg-ember/10"
+                      className={buttonVariants({ variant: "outline", size: "sm", className: "h-auto py-1.5 text-xs" })}
                     >
                       {item.label}
                     </button>
@@ -429,12 +431,12 @@ export function ClawAssistant() {
             >
               <Mic className="h-4 w-4" />
             </button>
-            <input
+            <Input
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               placeholder="Ask CLAW"
               maxLength={500}
-              className="h-11 min-w-0 flex-1 rounded-full border border-line bg-panel px-4 text-sm outline-none focus:border-ember"
+              className="h-11 min-w-0 flex-1 rounded-full px-4 text-sm"
             />
             <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-bone text-ink" aria-label="Send">
               <Send className="h-4 w-4" />
